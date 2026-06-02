@@ -46,9 +46,11 @@ const MapViewer = ({ properties, selectedArea }) => {
         {properties.slice(0, 50).map((p, idx) => {
           // Spread properties slightly around the area center so pins don't overlap totally
           const areaCenter = areaCoords[p.area_name] || defaultCenter;
-          const lat = areaCenter[0] + (Math.random() - 0.5) * 0.02;
-          const lng = areaCenter[1] + (Math.random() - 0.5) * 0.02;
-          
+          const jitterX = ((idx % 5) - 2) * 0.004;
+          const jitterY = (((idx + 1) % 3) - 1) * 0.004;
+          const lat = areaCenter[0] + jitterX;
+          const lng = areaCenter[1] + jitterY;
+
           return (
             <Marker key={idx} position={[lat, lng]}>
               <Popup>

@@ -209,7 +209,7 @@ router.get('/me', verifyToken, async (req, res) => {
         phone: user.phone
       }
     });
-  } catch (error) {
+  } catch {
     res.status(500).json({ 
       success: false, 
       message: 'Error fetching user' 

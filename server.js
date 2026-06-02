@@ -1,11 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import sqlite3 from 'sqlite3';
 import fs from 'fs';
 import csv from 'csv-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import os from 'os';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -16,10 +14,6 @@ const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();
-
-// Use /tmp/ on Vercel since other folders are read-only in Serverless Functions
-const dbPath = process.env.VERCEL ? path.join(os.tmpdir(), 'database.sqlite') : path.join(__dirname, 'database.sqlite');
-const db = new sqlite3.Database(dbPath);
 
 const app = express();
 app.use(cors({
@@ -119,91 +113,87 @@ const parseCSV = (filename) => {
       .on('error', (err) => reject(err));
   });
 };
+let properties = [];
 
 const initDb = new Promise((resolve) => {
-  db.serialize(async () => {
-  console.log("Setting up the database...");
-  db.run(`DROP TABLE IF EXISTS properties`);
-  db.run(`CREATE TABLE properties (
-    id TEXT PRIMARY KEY,
-    title TEXT,
-    location TEXT,
-    price TEXT,
-    bedrooms INTEGER,
-    bathrooms INTEGER,
-    area TEXT,
-    image TEXT,
-    featured INTEGER,
-    area_name TEXT,
-    details TEXT
-  )`);
+  (async () => {
+    console.log("Setting up properties from CSV...");
+    const newProperties = [];
+    let totalInserted = 0;
+    
+    for (const file of filesToProcess) {
+      try {
+        const rows = await parseCSV(file); // Grab all rows per file
+        let areaName = path.basename(file, '.csv').replace('_', ' ');
 
-  const stmt = db.prepare('INSERT INTO properties VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        rows.forEach((row, i) => {
+          let uniqueId = (row.property_id || '') + '_' + Date.now() + Math.random().toString().slice(2, 6);
+          
+          let typeStr = row.type || 'BHK2';
+          let bedroomsMatch = typeStr.match(/\d+/);
+          let bedrooms = bedroomsMatch ? parseInt(bedroomsMatch[0]) : 2;
+          let bathrooms = parseInt(row.bathroom) || 2;
+          
+          let title = `${row.furnishing ? row.furnishing.replace('_', ' ') : 'Premium'} ${typeStr} PG`;
+          let location = `${row.locality || 'Bangalore'}, Bangalore (${row.pin_code || ''})`;
+          let price = `₹${row.rent || '20000'} / month`;
+          let area = `${row.property_size || '1000'} sq.ft`;
+          let featured = i < 2 ? 1 : 0; // Feature first 2 from each file
+          
+          // Pick an image reliably
+          let img = images[(totalInserted + i) % images.length];
+          let detailsJSON = JSON.stringify(row);
 
-  console.log("Processing CSV files...");
-  let totalInserted = 0;
-  
-  for (const file of filesToProcess) {
-    try {
-      const rows = await parseCSV(file); // Grab all rows per file
-      let areaName = path.basename(file, '.csv').replace('_', ' ');
-
-      rows.forEach((row, i) => {
-        let uniqueId = (row.property_id || '') + '_' + Date.now() + Math.random().toString().slice(2, 6);
-        
-        let typeStr = row.type || 'BHK2';
-        let bedroomsMatch = typeStr.match(/\d+/);
-        let bedrooms = bedroomsMatch ? parseInt(bedroomsMatch[0]) : 2;
-        let bathrooms = parseInt(row.bathroom) || 2;
-        
-        let title = `${row.furnishing ? row.furnishing.replace('_', ' ') : 'Premium'} ${typeStr} PG`;
-        let location = `${row.locality || 'Bangalore'}, Bangalore (${row.pin_code || ''})`;
-        let price = `₹${row.rent || '20000'} / month`;
-        let area = `${row.property_size || '1000'} sq.ft`;
-        let featured = i < 2 ? 1 : 0; // Feature first 2 from each file
-        
-        // Pick an image reliably
-        let img = images[(totalInserted + i) % images.length];
-        let detailsJSON = JSON.stringify(row);
-
-        stmt.run(uniqueId, title, location, price, bedrooms, bathrooms, area, img, featured, areaName, detailsJSON);
-        totalInserted++;
-      });
-      console.log(`Processed ${rows.length} rows from ${file}`);
-    } catch (err) {
-      console.error(`Error processing ${file}:`, err);
+          newProperties.push({
+            id: uniqueId,
+            title,
+            location,
+            price,
+            bedrooms,
+            bathrooms,
+            area,
+            image: img,
+            featured,
+            area_name: areaName,
+            details: detailsJSON
+          });
+          totalInserted++;
+        });
+        console.log(`Processed ${rows.length} rows from ${file}`);
+      } catch (err) {
+        console.error(`Error processing ${file}:`, err);
+      }
     }
-  }
-
-  stmt.finalize();
-    console.log(`Successfully completed! Inserted a total of ${totalInserted} property records into SQLite.`);
+    properties = newProperties;
+    console.log(`Successfully completed! Loaded a total of ${totalInserted} property records into memory.`);
     resolve();
-  });
+  })();
 });
 
 // Search and Read properties
 app.get('/api/properties', async (req, res) => {
-  await initDb;
-  const { search } = req.query;
-  let sql = 'SELECT * FROM properties';
-  let params = [];
-  
-  if (search) {
-     sql += ' WHERE location LIKE ? OR title LIKE ? OR area_name LIKE ?';
-     params = [`%${search}%`, `%${search}%`, `%${search}%`];
-  }
-
-  db.all(sql, params, (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+  try {
+    await initDb;
+    const { search } = req.query;
+    let results = properties;
+    
+    if (search) {
+      const query = search.toLowerCase();
+      results = properties.filter(r => 
+        (r.location && r.location.toLowerCase().includes(query)) ||
+        (r.title && r.title.toLowerCase().includes(query)) ||
+        (r.area_name && r.area_name.toLowerCase().includes(query))
+      );
     }
-    const formatted = rows.map(r => ({
+
+    const formatted = results.map(r => ({
       ...r,
       featured: r.featured === 1
     }));
     res.json(formatted);
-  });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.get('/api/debug', (req, res) => {

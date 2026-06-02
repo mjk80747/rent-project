@@ -4,14 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": ">=20.0.0"
+    "node": "20.x"
   },
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "vite --port 3000",
     "dev:backend": "cross-env NODE_ENV=development node server.js",
     "start": "cross-env NODE_ENV=production node server.js",
-    "build": "npm rebuild sqlite3 --build-from-source && vite build",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -32,8 +32,7 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.0",
     "react-leaflet": "^4.2.1",
-    "react-router-dom": "^6.14.0",
-    "sqlite3": "^5.1.6"
+    "react-router-dom": "^6.14.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

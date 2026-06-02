@@ -2,7 +2,7 @@ import React from 'react';
 import { Heart, Sun, Moon, User } from 'lucide-react';
 import './Header.css';
 
-const Header = ({ onLogout, onToggleTheme, isDark, savedCount, onShowWishlist, onShowProfile }) => {
+const Header = ({ onToggleTheme, isDark, savedCount, onShowWishlist, onShowProfile }) => {
   return (
     <header className="app-header">
       <div className="header-container">

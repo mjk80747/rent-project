@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import PropertyCard, { SkeletonCard } from './components/PropertyCard';
 import { Toaster, toast } from 'react-hot-toast';
@@ -36,16 +36,16 @@ function App() {
   });
 
   // Helper function to get user-specific localStorage key
-  const getUserKey = (key) => {
+  const getUserKey = useCallback((key) => {
     return user?.id ? `${key}_${user.id}` : key;
-  };
+  }, [user?.id]);
 
-  const fetchProperties = (query = '') => {
+  const fetchProperties = useCallback((query = '') => {
     setLoading(true);
     const isDev = window.location.hostname === 'localhost';
     const API_BASE_URL = isDev ? 'http://localhost:5000' : '';
     const url = query ? `${API_BASE_URL}/api/properties?search=${query}` : `${API_BASE_URL}/api/properties`;
-    
+
     fetch(url)
       .then(res => res.json())
       .then(data => {
@@ -53,10 +53,10 @@ function App() {
         setLoading(false);
       })
       .catch(err => {
-        console.error("Failed to fetch properties:", err);
+        console.error('Failed to fetch properties:', err);
         setLoading(false);
       });
-  };
+  }, []);
 
   useEffect(() => {
     fetchProperties();
@@ -86,7 +86,7 @@ function App() {
     };
     window.addEventListener('scroll', checkScrollTop);
     return () => window.removeEventListener('scroll', checkScrollTop);
-  }, []);
+  }, [fetchProperties, getUserKey]);
 
   const scrollTop = () => {
     window.scrollTo({top: 0, behavior: 'smooth'});

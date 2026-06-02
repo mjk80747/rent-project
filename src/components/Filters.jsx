@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import './Filters.css';
 
 const Filters = ({ filters, setFilters, onApply }) => {
