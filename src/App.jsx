@@ -42,18 +42,25 @@ function App() {
 
   const fetchProperties = useCallback((query = '') => {
     setLoading(true);
-    const isDev = window.location.hostname === 'localhost';
+    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const API_BASE_URL = isDev ? 'http://localhost:5000' : '';
     const url = query ? `${API_BASE_URL}/api/properties?search=${query}` : `${API_BASE_URL}/api/properties`;
 
     fetch(url)
-      .then(res => res.json())
+      .then(async (res) => {
+        const contentType = res.headers.get('content-type') || '';
+        if (!res.ok || !contentType.includes('application/json')) {
+          throw new Error('Failed to load properties');
+        }
+        return res.json();
+      })
       .then(data => {
-        setProperties(data);
+        setProperties(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(err => {
         console.error('Failed to fetch properties:', err);
+        setProperties([]);
         setLoading(false);
       });
   }, []);
