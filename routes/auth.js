@@ -5,6 +5,18 @@ import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
+const ensureAuthConfig = (res) => {
+  if (!process.env.TOKEN_KEY) {
+    res.status(500).json({
+      success: false,
+      message: 'Server auth configuration is missing TOKEN_KEY',
+    });
+    return false;
+  }
+
+  return true;
+};
+
 // Input validation helper
 const validateEmail = (email) => {
   return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email);
@@ -17,6 +29,8 @@ const validatePhone = (phone) => {
 // SIGNUP
 router.post('/signup', async (req, res) => {
   try {
+    if (!ensureAuthConfig(res)) return;
+
     const { name, email, phone, password, confirmPassword } = req.body;
 
     // Validation
@@ -116,6 +130,8 @@ router.post('/signup', async (req, res) => {
 // LOGIN
 router.post('/login', async (req, res) => {
   try {
+    if (!ensureAuthConfig(res)) return;
+
     const { email, password } = req.body;
 
     // Validation

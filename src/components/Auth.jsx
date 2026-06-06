@@ -24,6 +24,19 @@ const Auth = ({ onLoginSuccess }) => {
 
   const API_URL = getAPIURL();
 
+  const parseResponse = async (response) => {
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      return response.json();
+    }
+
+    const text = await response.text();
+    return {
+      success: false,
+      message: text || 'Unexpected server response',
+    };
+  };
+
   const handleSignup = async (e) => {
     e.preventDefault();
     if (!name || !email || !phone || !password || !confirmPassword) {
@@ -47,7 +60,7 @@ const Auth = ({ onLoginSuccess }) => {
         body: JSON.stringify({ name, email, phone, password, confirmPassword })
       });
 
-      const data = await response.json();
+      const data = await parseResponse(response);
 
       if (!response.ok) {
         toast.error(data.message || 'Signup failed');
@@ -93,7 +106,7 @@ const Auth = ({ onLoginSuccess }) => {
         body: JSON.stringify({ email, password })
       });
 
-      const data = await response.json();
+      const data = await parseResponse(response);
 
       if (!response.ok) {
         toast.error(data.message || 'Login failed');
