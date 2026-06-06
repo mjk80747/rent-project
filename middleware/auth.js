@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
+import { getTokenKey } from '../config/authConfig.js';
 
 export const verifyToken = (req, res, next) => {
   const token = req.cookies?.token;
+  const tokenKey = getTokenKey();
 
   if (!token) {
     return res.status(403).json({ 
@@ -10,8 +12,15 @@ export const verifyToken = (req, res, next) => {
     });
   }
 
+  if (!tokenKey) {
+    return res.status(500).json({
+      success: false,
+      message: 'Server auth configuration is missing TOKEN_KEY',
+    });
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.TOKEN_KEY);
+    const decoded = jwt.verify(token, tokenKey);
     req.userId = decoded.id;
     next();
   } catch {

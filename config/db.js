@@ -8,6 +8,13 @@ if (!cached) {
 
 const isLocalMongoUri = (uri) => /mongodb(\+srv)?:\/\/(localhost|127\.0\.0\.1)/i.test(uri);
 
+export const isDatabaseConfigured = () => {
+  const uri = process.env.MONGODB_URI?.trim();
+  if (!uri) return false;
+  if (process.env.VERCEL && isLocalMongoUri(uri)) return false;
+  return true;
+};
+
 export const getMongoUri = () => {
   const uri = process.env.MONGODB_URI?.trim();
 
