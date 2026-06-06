@@ -1,7 +1,8 @@
 {
   "functions": {
     "api/**/*.js": {
-      "includeFiles": "**/*.csv"
+      "includeFiles": "**/*.csv",
+      "maxDuration": 30
     }
   },
   "rewrites": [

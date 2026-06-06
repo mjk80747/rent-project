@@ -8,6 +8,8 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import connectDB, { getDatabaseErrorMessage } from './config/db.js';
+import { getAuthMode } from './config/authConfig.js';
+import { ensureDemoAuth } from './config/demoAuth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -88,34 +90,44 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(async (req, res, next) => {
-  if (!req.path.startsWith('/api/auth')) {
-    return next();
-  }
+app.get('/api/health', async (req, res) => {
+  const mode = getAuthMode();
 
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    console.error('Database connection failed:', error.message);
-    res.status(503).json({
-      success: false,
-      message: getDatabaseErrorMessage(error),
+  if (mode === 'demo') {
+    await ensureDemoAuth();
+    return res.json({
+      success: true,
+      mode,
+      message: 'API is running in demo auth mode. Add MONGODB_URI in Vercel for persistent login.',
+      demoLogin: {
+        email: 'demo@pg.com',
+        password: 'demo123',
+      },
+      environment: process.env.VERCEL ? 'vercel' : 'local',
     });
   }
-});
 
-app.get('/api/health', async (req, res) => {
+  if (mode === 'unconfigured') {
+    return res.status(503).json({
+      success: false,
+      mode,
+      message: getDatabaseErrorMessage(new Error('MONGODB_URI is not configured')),
+      environment: process.env.VERCEL ? 'vercel' : 'local',
+    });
+  }
+
   try {
     await connectDB();
-    res.json({
+    return res.json({
       success: true,
+      mode,
       message: 'API and database are healthy',
       environment: process.env.VERCEL ? 'vercel' : 'local',
     });
   } catch (error) {
-    res.status(503).json({
+    return res.status(503).json({
       success: false,
+      mode,
       message: getDatabaseErrorMessage(error),
       environment: process.env.VERCEL ? 'vercel' : 'local',
     });
