@@ -7,13 +7,15 @@ import { fileURLToPath } from 'url';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
-import connectDB from './config/db.js';
+import connectDB, { getDatabaseErrorMessage } from './config/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables
-dotenv.config();
+// Load local .env only during development (Vercel uses dashboard env vars)
+if (!process.env.VERCEL) {
+  dotenv.config();
+}
 
 const normalizeOrigin = (value) => {
   if (!value) return null;
@@ -98,7 +100,24 @@ app.use(async (req, res, next) => {
     console.error('Database connection failed:', error.message);
     res.status(503).json({
       success: false,
-      message: 'Database connection failed. Please try again later.',
+      message: getDatabaseErrorMessage(error),
+    });
+  }
+});
+
+app.get('/api/health', async (req, res) => {
+  try {
+    await connectDB();
+    res.json({
+      success: true,
+      message: 'API and database are healthy',
+      environment: process.env.VERCEL ? 'vercel' : 'local',
+    });
+  } catch (error) {
+    res.status(503).json({
+      success: false,
+      message: getDatabaseErrorMessage(error),
+      environment: process.env.VERCEL ? 'vercel' : 'local',
     });
   }
 });
