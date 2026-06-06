@@ -132,30 +132,36 @@ const Auth = ({ onLoginSuccess }) => {
   };
 
   const renderLogin = () => (
-    <form onSubmit={handleLogin} className="auth-form">
+    <form onSubmit={handleLogin} className="auth-form" autoComplete="on">
       <h2>Welcome Back</h2>
       <p className="auth-subtitle">Login to your PG Account</p>
       
       <div className="form-group">
-        <label>Email Address</label>
+        <label htmlFor="login-email">Email Address</label>
         <input 
+          id="login-email"
+          name="email"
           type="email" 
           placeholder="your.email@example.com" 
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
           required
           disabled={loading}
         />
       </div>
       
       <div className="form-group">
-        <label>Password</label>
+        <label htmlFor="login-password">Password</label>
         <div style={{ position: 'relative' }}>
           <input 
+            id="login-password"
+            name="password"
             type={showPassword ? "text" : "password"} 
             placeholder="Enter your password" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
             required
             disabled={loading}
             style={{ width: '100%', paddingRight: '40px' }}
@@ -182,43 +188,52 @@ const Auth = ({ onLoginSuccess }) => {
   );
 
   const renderSignup = () => (
-    <form onSubmit={handleSignup} className="auth-form">
+    <form onSubmit={handleSignup} className="auth-form" autoComplete="on">
       <h2>Create Account</h2>
       <p className="auth-subtitle">Join PG Management Systems</p>
       
       <div className="form-group">
-        <label>Full Name</label>
+        <label htmlFor="signup-name">Full Name</label>
         <input 
+          id="signup-name"
+          name="name"
           type="text" 
           placeholder="John Doe" 
           value={name}
           onChange={(e) => setName(e.target.value)}
+          autoComplete="name"
           required 
           disabled={loading}
         />
       </div>
 
       <div className="form-group">
-        <label>Email Address</label>
+        <label htmlFor="signup-email">Email Address</label>
         <input 
+          id="signup-email"
+          name="email"
           type="email" 
           placeholder="john@example.com" 
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
           required 
           disabled={loading}
         />
       </div>
 
       <div className="form-group">
-        <label>Phone Number</label>
+        <label htmlFor="signup-phone">Phone Number</label>
         <div className="phone-input-group">
           <span className="country-code">+91</span>
           <input 
+            id="signup-phone"
+            name="phone"
             type="tel" 
             placeholder="10-digit number" 
             value={phone}
             onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+            autoComplete="tel"
             maxLength="10"
             required
             disabled={loading}
@@ -227,13 +242,16 @@ const Auth = ({ onLoginSuccess }) => {
       </div>
       
       <div className="form-group">
-        <label>Password</label>
+        <label htmlFor="signup-password">Password</label>
         <div style={{ position: 'relative' }}>
           <input 
+            id="signup-password"
+            name="new-password"
             type={showPassword ? "text" : "password"} 
             placeholder="Create a password (min 6 characters)" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
             required 
             disabled={loading}
             style={{ width: '100%', paddingRight: '40px' }}
@@ -249,13 +267,16 @@ const Auth = ({ onLoginSuccess }) => {
       </div>
 
       <div className="form-group">
-        <label>Confirm Password</label>
+        <label htmlFor="signup-confirm-password">Confirm Password</label>
         <div style={{ position: 'relative' }}>
           <input 
+            id="signup-confirm-password"
+            name="confirm-password"
             type={showPassword ? "text" : "password"} 
             placeholder="Confirm your password" 
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            autoComplete="new-password"
             required 
             disabled={loading}
             style={{ width: '100%', paddingRight: '40px' }}
@@ -274,13 +295,23 @@ const Auth = ({ onLoginSuccess }) => {
   );
 
   const renderForgot = () => (
-    <form onSubmit={(e) => { e.preventDefault(); toast.success("Reset link sent to your email!"); setView('login'); }} className="auth-form">
+    <form onSubmit={(e) => { e.preventDefault(); toast.success("Reset link sent to your email!"); setView('login'); }} className="auth-form" autoComplete="on">
       <h2>Reset Password</h2>
       <p className="auth-subtitle">We will send a reset link to your email</p>
       
       <div className="form-group">
-        <label>Email Address</label>
-        <input type="email" placeholder="Enter your email" required disabled={loading} />
+        <label htmlFor="forgot-email">Email Address</label>
+        <input
+          id="forgot-email"
+          name="email"
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          required
+          disabled={loading}
+        />
       </div>
       
       <button type="submit" className="btn-primary w-100 mb-3" disabled={loading}>Send Reset Link</button>
