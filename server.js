@@ -15,31 +15,54 @@ const __dirname = path.dirname(__filename);
 // Load environment variables
 dotenv.config();
 
+const normalizeOrigin = (value) => {
+  if (!value) return null;
+
+  const trimmed = value.trim().replace(/\/$/, '');
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return trimmed;
+  }
+
+  return `https://${trimmed}`;
+};
+
 const getAllowedOrigins = () => {
-  const origins = new Set();
-
-  if (process.env.FRONTEND_URL) {
-    origins.add(process.env.FRONTEND_URL);
-  }
-
-  if (process.env.VERCEL_URL) {
-    origins.add(`https://${process.env.VERCEL_URL}`);
-  }
-
-  if (process.env.VERCEL_BRANCH_URL) {
-    origins.add(`https://${process.env.VERCEL_BRANCH_URL}`);
-  }
+  const origins = new Set([
+    normalizeOrigin(process.env.FRONTEND_URL),
+    normalizeOrigin(process.env.VERCEL_URL),
+    normalizeOrigin(process.env.VERCEL_BRANCH_URL),
+    normalizeOrigin(process.env.VERCEL_PROJECT_PRODUCTION_URL),
+  ].filter(Boolean));
 
   return origins;
+};
+
+const isVercelAppOrigin = (origin) => {
+  try {
+    const { hostname } = new URL(origin);
+    return hostname.endsWith('.vercel.app');
+  } catch {
+    return false;
+  }
+};
+
+const isOriginAllowed = (origin) => {
+  if (!origin) return true;
+
+  const normalizedOrigin = origin.replace(/\/$/, '');
+
+  if (process.env.VERCEL && isVercelAppOrigin(normalizedOrigin)) {
+    return true;
+  }
+
+  return getAllowedOrigins().has(normalizedOrigin);
 };
 
 const app = express();
 app.use(cors({
   origin: function(origin, callback) {
-    if (process.env.NODE_ENV === 'production') {
-      const allowedOrigins = getAllowedOrigins();
-
-      if (!origin || allowedOrigins.has(origin)) {
+    if (process.env.NODE_ENV !== 'production') {
+      if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('192.168')) {
         callback(null, true);
         return;
       }
@@ -48,11 +71,12 @@ app.use(cors({
       return;
     }
 
-    if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('192.168')) {
+    if (isOriginAllowed(origin)) {
       callback(null, true);
       return;
     }
 
+    console.error('Blocked CORS origin:', origin, 'Allowed:', [...getAllowedOrigins()]);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
