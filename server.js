@@ -9,7 +9,6 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import connectDB, { getDatabaseErrorMessage } from './config/db.js';
 import { getAuthMode } from './config/authConfig.js';
-import { ensureDemoAuth } from './config/demoAuth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -92,20 +91,6 @@ app.use(cookieParser());
 
 app.get('/api/health', async (req, res) => {
   const mode = getAuthMode();
-
-  if (mode === 'demo') {
-    await ensureDemoAuth();
-    return res.json({
-      success: true,
-      mode,
-      message: 'API is running in demo auth mode. Add MONGODB_URI in Vercel for persistent login.',
-      demoLogin: {
-        email: 'demo@pg.com',
-        password: 'demo123',
-      },
-      environment: process.env.VERCEL ? 'vercel' : 'local',
-    });
-  }
 
   if (mode === 'unconfigured') {
     return res.status(503).json({
