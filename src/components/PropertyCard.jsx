@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Heart, ChevronLeft, ChevronRight, Star, MapPin, Check, Phone, Calendar } from 'lucide-react';
-import './PropertyCard.css';
+import { useState } from 'react';
+import { motion as Motion } from 'motion/react';
+import { Heart, ChevronLeft, ChevronRight, Star, MapPin, Check, Phone } from 'lucide-react';
+import { EASE } from '../animations/variants';
 import './PropertyCard.css';
 
 export const SkeletonCard = () => (
@@ -77,7 +78,14 @@ const PropertyCard = ({ property, isSaved, onToggleSave, onScheduleVisit, idx = 
 
   return (
     <>
-      <div className="property-card" style={{ animation: `fadeUp 0.5s ease-out backwards`, animationDelay: `${idx * 0.08}s` }}>
+      <Motion.div
+        className="property-card"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.15 }}
+        transition={{ duration: 0.5, ease: EASE, delay: Math.min(idx, 7) * 0.08 }}
+        whileHover={{ y: -8, scale: 1.03 }}
+      >
         <div className="property-image-container">
           {/* Image Slider */}
           <img 
@@ -165,7 +173,7 @@ const PropertyCard = ({ property, isSaved, onToggleSave, onScheduleVisit, idx = 
             </div>
           )}
         </div>
-      </div>
+      </Motion.div>
 
       {/* Schedule Visit Modal */}
       {showModal && (
