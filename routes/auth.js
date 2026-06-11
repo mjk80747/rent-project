@@ -6,7 +6,6 @@ import { getAuthMode, getTokenKey } from '../config/authConfig.js';
 import {
   compareDemoPassword,
   createDemoUser,
-  ensureDemoAuth,
   findDemoUserByEmail,
   findDemoUserByPhone,
   findDemoUserById,
