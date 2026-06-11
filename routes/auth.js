@@ -3,15 +3,6 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import connectDB from '../config/db.js';
 import { getAuthMode, getTokenKey } from '../config/authConfig.js';
-import {
-  compareDemoPassword,
-  createDemoUser,
-  ensureDemoAuth,
-  findDemoUserByEmail,
-  findDemoUserByPhone,
-  findDemoUserById,
-  isDemoAuthEnabled,
-} from '../config/demoAuth.js';
 import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -108,21 +99,6 @@ router.post('/signup', async (req, res) => {
       });
     }
 
-    if (isDemoAuthEnabled()) {
-      const existingEmail = await findDemoUserByEmail(email);
-      const existingPhone = await findDemoUserByPhone(phone);
-
-      if (existingEmail || existingPhone) {
-        return res.status(409).json({
-          success: false,
-          message: existingEmail ? 'Email already registered' : 'Phone number already registered',
-        });
-      }
-
-      const user = await createDemoUser({ name, email, phone, password });
-      return sendAuthSuccess(res, user, 201, 'Account created successfully in demo mode');
-    }
-
     await connectDB();
 
     const existingUser = await User.findOne({
@@ -170,19 +146,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    if (isDemoAuthEnabled()) {
-      const user = await findDemoUserByEmail(email);
-
-      if (!user || !(await compareDemoPassword(user, password))) {
-        return res.status(401).json({
-          success: false,
-          message: 'Invalid email or password',
-        });
-      }
-
-      return sendAuthSuccess(res, user);
-    }
-
     await connectDB();
 
     const user = await User.findOne({ email }).select('+password');
@@ -223,27 +186,6 @@ router.post('/logout', (req, res) => {
 
 router.get('/me', verifyToken, async (req, res) => {
   try {
-    if (isDemoAuthEnabled()) {
-      const user = await findDemoUserById(req.userId);
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: 'User not found',
-        });
-      }
-
-      return res.json({
-        success: true,
-        mode: getAuthMode(),
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-        },
-      });
-    }
-
     await connectDB();
     const user = await User.findById(req.userId);
 
