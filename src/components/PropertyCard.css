@@ -11,10 +11,17 @@
   height: 100%;
 }
 
+.property-card {
+  will-change: transform;
+}
+
 .property-card:hover {
-  transform: translateY(-8px);
   border-color: rgba(79, 70, 229, 0.4);
-  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.55), 0 0 24px rgba(79, 70, 229, 0.18);
+}
+
+.property-card:hover .property-image {
+  transform: scale(1.08);
 }
 
 .property-image-container {

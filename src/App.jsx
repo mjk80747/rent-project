@@ -1,11 +1,17 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { motion as Motion, AnimatePresence } from 'motion/react';
 import Header from './components/Header';
 import PropertyCard, { SkeletonCard } from './components/PropertyCard';
+import Stats from './components/Stats';
+import RevealOnScroll from './components/RevealOnScroll';
 import { Toaster, toast } from 'react-hot-toast';
 import { ArrowUp } from 'lucide-react';
 import Filters from './components/Filters';
 import Auth from './components/Auth';
+import { heroContainer, fadeUp, pageTransition } from './animations/variants';
 import './App.css';
+
+const LottieLoader = lazy(() => import('./components/LottieLoader'));
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -248,6 +254,14 @@ function App() {
     );
   }
 
+  const viewKey = showProfile
+    ? 'profile'
+    : showWishlist
+      ? 'wishlist'
+      : (!selectedArea && !searchQuery)
+        ? 'landing'
+        : 'results';
+
   return (
     <div className="app-wrapper">
       <Toaster />
@@ -261,6 +275,14 @@ function App() {
       />
       
       <main className="main-content">
+        <AnimatePresence mode="wait">
+        <Motion.div
+          key={viewKey}
+          variants={pageTransition}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+        >
         {showProfile ? (
           // USER PROFILE DASHBOARD
           <section className="profile-dashboard container" style={{ padding: '40px 0' }}>
@@ -354,18 +376,23 @@ function App() {
 
         ) : !selectedArea && !searchQuery ? (
           // LOCATION SELECT VIEW
-          <section className="hero-section">
+          <section className="hero-section hero-zoom">
             <div className="container">
-              <div className="hero-content">
-                <span className="badge-new">PG Management Systems</span>
-                <h2 className="hero-title">
+              <Motion.div
+                className="hero-content"
+                variants={heroContainer}
+                initial="hidden"
+                animate="visible"
+              >
+                <Motion.span className="badge-new" variants={fadeUp}>PG Management Systems</Motion.span>
+                <Motion.h2 className="hero-title" variants={fadeUp}>
                   Discover Top PGs in <span className="highlight-text">Bangalore</span>
-                </h2>
-                <p className="hero-subtitle">
+                </Motion.h2>
+                <Motion.p className="hero-subtitle" variants={fadeUp}>
                   Select a location below to view all available PG accommodations loaded directly from the datasets.
-                </p>
+                </Motion.p>
                 
-                <div className="search-bar glass-panel" style={{ position: 'relative', overflow: 'visible' }}>
+                <Motion.div className="search-bar glass-panel" variants={fadeUp} style={{ position: 'relative', overflow: 'visible' }}>
                   <div className="search-input">
                     <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     <input 
@@ -414,15 +441,25 @@ function App() {
                       )}
                     </div>
                   )}
-                </div>
-              </div>
+                </Motion.div>
+              </Motion.div>
+
+              <Stats propertyCount={properties.length} areaCount={areas.length} />
+
+              <RevealOnScroll direction="up" className="locations-heading">
+                <h3 className="section-title" style={{ textAlign: 'center', marginTop: '2rem' }}>Explore by Locality</h3>
+              </RevealOnScroll>
 
               <div className="locations-grid" style={{
-                display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginTop: '4rem'
+                display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem', marginTop: '2rem'
               }}>
-                {areas.map((area) => (
+                {areas.map((area, areaIdx) => (
+                  <RevealOnScroll
+                    key={area}
+                    direction={areaIdx % 2 === 0 ? 'left' : 'right'}
+                    delay={(areaIdx % 4) * 0.05}
+                  >
                   <div 
-                    key={area} 
                     className="location-card glass-panel"
                     onClick={() => setSelectedArea(area)}
                     style={{
@@ -444,6 +481,7 @@ function App() {
                     <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>{area}</h3>
                     <p style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>Explore Neighborhood</p>
                   </div>
+                  </RevealOnScroll>
                 ))}
               </div>
             </div>
@@ -493,7 +531,14 @@ function App() {
               
               <div className="properties-grid" style={{ flexGrow: 1 }}>
                 {loading ? (
-                  Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+                  <>
+                    <div className="grid-loader" style={{ gridColumn: '1 / -1' }}>
+                      <Suspense fallback={null}>
+                        <LottieLoader size={120} label="Finding the best PGs for you..." />
+                      </Suspense>
+                    </div>
+                    {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+                  </>
                 ) : filteredProperties.length > 0 ? (
                   filteredProperties.map((property, idx) => (
                     <PropertyCard 
@@ -517,6 +562,8 @@ function App() {
             </div>
           </section>
         )}
+        </Motion.div>
+        </AnimatePresence>
       </main>
 
       <footer className="footer border-top">

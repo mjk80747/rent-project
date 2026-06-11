@@ -371,3 +371,57 @@
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(79, 70, 229, 0.6);
 }
+
+/* ===== Premium Animations ===== */
+
+/* Hero background subtle zoom (plays once on load) */
+.hero-zoom::before {
+  animation: heroZoom 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes heroZoom {
+  from {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Lottie loader */
+.lottie-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 32px 0;
+}
+
+.lottie-loader-label {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.grid-loader {
+  display: flex;
+  justify-content: center;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .hero-zoom::before,
+  .property-card,
+  .property-card .property-image,
+  .app-header,
+  .app-header .logo h1 {
+    animation: none !important;
+    transition: none !important;
+  }
+  .property-card:hover .property-image {
+    transform: none;
+  }
+}
