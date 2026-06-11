@@ -15,7 +15,6 @@ const Auth = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [authMode, setAuthMode] = useState(null);
-  const [demoCredentials, setDemoCredentials] = useState(null);
 
   // Dynamic API URL based on environment
   const getAPIURL = () => {
@@ -45,10 +44,6 @@ const Auth = ({ onLoginSuccess }) => {
         const response = await fetch(`${API_URL.replace('/api/auth', '')}/api/health`);
         const data = await parseResponse(response);
         setAuthMode(data.mode || (data.success ? 'database' : 'unconfigured'));
-
-        if (data.demoLogin) {
-          setDemoCredentials(data.demoLogin);
-        }
       } catch (error) {
         console.error('Health check failed:', error);
         setAuthMode('unconfigured');
@@ -349,14 +344,6 @@ const Auth = ({ onLoginSuccess }) => {
         <div className="auth-brand">
           <h1>PG Management<span className="highlight-text">Systems</span></h1>
         </div>
-
-        {authMode === 'demo' && demoCredentials && (
-          <div className="auth-notice">
-            <strong>Demo mode active.</strong> Use{' '}
-            <span>{demoCredentials.email}</span> / <span>{demoCredentials.password}</span>{' '}
-            to log in. Add <code>MONGODB_URI</code> in Vercel for persistent accounts.
-          </div>
-        )}
 
         {authMode === 'unconfigured' && (
           <div className="auth-notice auth-notice-error">
