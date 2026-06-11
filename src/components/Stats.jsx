@@ -1,9 +1,13 @@
 import { useRef } from 'react';
 import { motion as Motion, useInView } from 'motion/react';
-import CountUp from 'react-countup';
+import CountUpModule from 'react-countup';
 import { Building2, MapPin, Users, Star } from 'lucide-react';
 import { gridContainer, cardItem } from '../animations/variants';
 import './Stats.css';
+
+// react-countup ships CommonJS; under rolldown-vite the default import resolves
+// to the module namespace object, so unwrap the actual component.
+const CountUp = CountUpModule.default || CountUpModule;
 
 const Stats = ({ propertyCount = 0, areaCount = 0 }) => {
   const ref = useRef(null);
