@@ -4,6 +4,21 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined;
+          // NOTE: lottie is intentionally NOT grouped here so it stays in the
+          // dynamically-imported (lazy) chunk and is not eagerly modulepreloaded.
+          if (id.includes('gsap')) return 'gsap';
+          if (id.includes('/motion/') || id.includes('framer-motion')) return 'motion';
+          if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/scheduler/')) return 'react-vendor';
+          return undefined;
+        },
+      },
+    },
+  },
   server: {
     host: true,
     proxy: {

@@ -3,16 +3,32 @@
   top: 0;
   width: 100%;
   z-index: 100;
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  padding: 16px 0;
+  background: transparent;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border-bottom: 1px solid transparent;
+  padding: 24px 0;
   animation: slideDown 0.5s ease-out;
+  transition: padding 0.3s ease, background 0.3s ease, border-color 0.3s ease,
+    backdrop-filter 0.3s ease, box-shadow 0.3s ease;
 }
 
-body.light-mode .app-header {
-  background: rgba(255, 255, 255, 0.8);
+.app-header.scrolled {
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 0;
+  box-shadow: var(--shadow-glass);
+}
+
+.logo h1,
+.app-header .icon-btn {
+  transition: font-size 0.3s ease, transform 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.app-header.scrolled .logo h1 {
+  font-size: 1.5rem;
 }
 
 .header-container {
@@ -41,7 +57,9 @@ body.light-mode .app-header {
 }
 
 .icon-btn {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   color: var(--text-primary);
   border: 1px solid var(--border);
   border-radius: 50%;
@@ -51,14 +69,18 @@ body.light-mode .app-header {
   align-items: center;
   justify-content: center;
   position: relative;
+  transition: var(--transition);
+}
+
+body.light-mode .icon-btn {
+  background: rgba(0, 0, 0, 0.01);
 }
 
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-body.light-mode .icon-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--primary-light);
+  border-color: var(--primary);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-glow);
 }
 
 .wishlist-badge {

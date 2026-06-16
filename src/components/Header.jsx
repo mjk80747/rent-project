@@ -1,10 +1,19 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Heart, Sun, Moon, User } from 'lucide-react';
 import './Header.css';
 
 const Header = ({ onToggleTheme, isDark, savedCount, onShowWishlist, onShowProfile }) => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <header className="app-header">
+    <header className={`app-header${scrolled ? ' scrolled' : ''}`}>
       <div className="header-container">
         <div className="logo" onClick={() => onShowWishlist(false)} style={{cursor: 'pointer'}}>
           <h1>PG Management<span className="accent">System</span></h1>
