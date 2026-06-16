@@ -1,0 +1,138 @@
+.animated-bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--bg-color);
+  transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base blob style */
+.ambient-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.22;
+  mix-blend-mode: screen;
+  will-change: transform;
+  pointer-events: none;
+  transition: opacity 0.8s ease, background 0.8s ease;
+}
+
+body.light-mode .ambient-blob {
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  filter: blur(140px);
+}
+
+/* Blob specific dimensions and gradients */
+.blob-indigo {
+  width: 45vw;
+  height: 45vw;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.45) 0%, rgba(99, 102, 241, 0) 70%);
+  top: -10%;
+  left: -5%;
+  animation: float-blob-1 25s infinite alternate ease-in-out;
+}
+
+.blob-teal {
+  width: 55vw;
+  height: 55vw;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0) 70%);
+  bottom: -15%;
+  right: -10%;
+  animation: float-blob-2 30s infinite alternate ease-in-out;
+}
+
+.blob-amber {
+  width: 40vw;
+  height: 40vw;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0) 70%);
+  top: 25%;
+  left: 40%;
+  animation: float-blob-3 28s infinite alternate ease-in-out;
+}
+
+/* Light mode specific gradients (softer, pastel, blending with white/gray) */
+body.light-mode .blob-indigo {
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(99, 102, 241, 0) 70%);
+}
+
+body.light-mode .blob-teal {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(16, 185, 129, 0) 70%);
+}
+
+body.light-mode .blob-amber {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(245, 158, 11, 0) 70%);
+}
+
+/* Dot Grid Overlay */
+.tech-grid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  opacity: 0.9;
+  transition: background-image 0.8s ease;
+  z-index: 2;
+}
+
+body.light-mode .tech-grid {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+}
+
+/* GPU Accelerated Animations */
+@keyframes float-blob-1 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(6%, 8%, 0) scale(1.1) rotate(120deg);
+  }
+  100% {
+    transform: translate3d(-4%, 4%, 0) scale(0.9) rotate(240deg);
+  }
+}
+
+@keyframes float-blob-2 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.05) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(-8%, -6%, 0) scale(0.95) rotate(-180deg);
+  }
+  100% {
+    transform: translate3d(4%, 6%, 0) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes float-blob-3 {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.95) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(8%, -10%, 0) scale(1.05) rotate(-90deg);
+  }
+  100% {
+    transform: translate3d(-6%, 6%, 0) scale(1) rotate(180deg);
+  }
+}
+
+/* Canvas overlay */
+.bg-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}

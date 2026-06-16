@@ -9,6 +9,7 @@ import { ArrowUp } from 'lucide-react';
 import Filters from './components/Filters';
 import Auth from './components/Auth';
 import { heroContainer, fadeUp, pageTransition } from './animations/variants';
+import AnimatedBackground from './components/AnimatedBackground';
 import './App.css';
 
 const LottieLoader = lazy(() => import('./components/LottieLoader'));
@@ -248,6 +249,7 @@ function App() {
   if (!isAuthenticated) {
     return (
       <>
+        <AnimatedBackground isDark={isDark} />
         <Toaster />
         <Auth onLoginSuccess={handleLoginSuccess} />
       </>
@@ -264,6 +266,7 @@ function App() {
 
   return (
     <div className="app-wrapper">
+      <AnimatedBackground isDark={isDark} />
       <Toaster />
       <Header 
         onLogout={handleLogout} 

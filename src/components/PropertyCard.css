@@ -16,8 +16,9 @@
 }
 
 .property-card:hover {
-  border-color: rgba(79, 70, 229, 0.4);
-  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.55), 0 0 24px rgba(79, 70, 229, 0.18);
+  border-color: rgba(99, 102, 241, 0.45);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  transform: translateY(-4px);
 }
 
 .property-card:hover .property-image {
@@ -113,8 +114,9 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(8px);
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   color: var(--text-primary);
   padding: 10px 20px;
   font-family: var(--font-heading);
@@ -148,8 +150,11 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 4px 10px;
   border-radius: 12px;
   font-size: 0.85rem;
   color: var(--text-primary);
@@ -165,16 +170,16 @@
 }
 
 .commute-info {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--text-primary);
+  color: var(--secondary);
   font-size: 0.85rem;
   margin-bottom: 16px;
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
   padding: 6px 10px;
   border-radius: 6px;
-  display: inline-flex;
 }
 
 .property-features {
@@ -205,9 +210,11 @@
 .extended-details {
   margin-top: 20px;
   padding: 15px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--border-radius-md);
   border: 1px solid var(--border);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .extended-details h4 {
@@ -242,10 +249,14 @@
   width: 90%;
   max-width: 450px;
   background: var(--surface);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border: 1px solid var(--border);
   border-radius: var(--border-radius-lg);
   padding: 24px;
   color: var(--text-primary);
-  animation: modalIn 0.3s ease-out;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes modalIn {
@@ -280,11 +291,19 @@
 }
 .visit-form input {
   width: 100%;
-  padding: 10px;
-  border-radius: var(--border-radius-sm);
+  padding: 10px 14px;
+  border-radius: var(--border-radius-md);
   border: 1px solid var(--border);
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.03);
   color: var(--text-primary);
+  outline: none;
+  transition: var(--transition);
+}
+
+.visit-form input:focus {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-glow);
 }
 
 /* Skeleton Loading styles */

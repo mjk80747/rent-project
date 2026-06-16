@@ -1,18 +1,8 @@
 .auth-wrapper {
-  --primary: #0284c7;
-  --primary-color: #0284c7;
-  --bg-color: #f8fafc;
-  --surface: #ffffff;
-  --border-color: rgba(0, 0, 0, 0.1);
-  --text-color: #0f172a;
-  --text-muted: #64748b;
-  --accent-light: #0ea5e9;
-
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: var(--bg-color);
   padding: 20px;
 }
 
@@ -20,10 +10,12 @@
   max-width: 400px;
   width: 100%;
   padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  background-color: var(--surface);
-  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  background: var(--surface);
+  backdrop-filter: var(--glass-blur-heavy);
+  -webkit-backdrop-filter: var(--glass-blur-heavy);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-glass), 0 10px 30px rgba(0, 0, 0, 0.25);
   text-align: center;
 }
 
@@ -35,9 +27,9 @@
   margin-bottom: 1.25rem;
   padding: 12px 14px;
   border-radius: 10px;
-  background: rgba(2, 132, 199, 0.08);
-  border: 1px solid rgba(2, 132, 199, 0.2);
-  color: var(--text-color);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  color: var(--text-primary);
   font-size: 0.85rem;
   line-height: 1.5;
   text-align: left;
@@ -55,7 +47,7 @@
 .auth-brand h1 {
   font-size: 1.8rem;
   margin: 0;
-  color: var(--text-color);
+  color: var(--text-primary);
 }
 
 .auth-form {
@@ -66,11 +58,11 @@
 .auth-form h2 {
   font-size: 1.5rem;
   margin-bottom: 5px;
-  color: var(--text-color);
+  color: var(--text-primary);
 }
 
 .auth-subtitle {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
 }
@@ -84,23 +76,33 @@
   display: block;
   font-size: 0.9rem;
   margin-bottom: 5px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .form-group input {
   width: 100%;
   padding: 12px 14px;
   border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-color);
-  color: var(--text-color);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: var(--transition);
+}
+
+body.light-mode .form-group input {
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--primary-color);
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-glow);
+}
+
+body.light-mode .form-group input:focus {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .w-100 {
@@ -118,13 +120,13 @@
   flex-direction: column;
   gap: 10px;
   font-size: 0.9rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
 }
 
 .link-btn {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0;
   font: inherit;
@@ -132,11 +134,11 @@
 }
 
 .link-btn:hover {
-  color: var(--primary-color);
+  color: var(--primary);
 }
 
 .link-btn.highlight {
-  color: var(--accent-light);
+  color: var(--primary);
   font-weight: 600;
   text-decoration: none;
 }
@@ -146,37 +148,51 @@
 }
 
 .mock-otp-display {
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px dashed var(--primary-color);
+  background: rgba(255, 107, 107, 0.08);
+  border: 1px dashed var(--primary);
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 1.5rem;
-  color: var(--primary-color);
+  color: var(--primary);
   font-size: 1.1rem;
 }
 
 .phone-input-group {
   display: flex;
   align-items: center;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: var(--bg-color);
+  background: rgba(255, 255, 255, 0.03);
   overflow: hidden;
-  transition: border-color 0.2s;
+  transition: var(--transition);
+}
+
+body.light-mode .phone-input-group {
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .phone-input-group:focus-within {
-  border-color: var(--primary-color);
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-glow);
+}
+
+body.light-mode .phone-input-group:focus-within {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .country-code {
   padding: 12px 14px;
-  background: rgba(0, 0, 0, 0.03);
-  color: var(--text-color);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-primary);
   font-weight: 500;
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid var(--border);
   font-size: 1rem;
   white-space: nowrap;
+}
+
+body.light-mode .country-code {
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .phone-input-group input {
@@ -189,4 +205,5 @@
 
 .phone-input-group input:focus {
   border-color: transparent !important;
+  box-shadow: none !important;
 }
